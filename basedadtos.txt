@@ -1,0 +1,167 @@
+-- ==========================================
+-- TABLA: ordenes
+-- ==========================================
+CREATE TABLE ordenes (
+    id BIGSERIAL PRIMARY KEY,
+    numero_orden TEXT UNIQUE NOT NULL,
+    cliente TEXT,
+    fecha_pedido DATE,
+    fecha_entrega DATE,
+    fecha_creacion TIMESTAMPTZ DEFAULT NOW(),
+    fecha_completado TIMESTAMPTZ,
+    arte TEXT,
+    impresora TEXT,
+    tipo_prenda TEXT,
+    tipo_prenda_valor TEXT,
+    tela TEXT,
+    cuello TEXT,
+    color_cuello TEXT,
+    marquilla TEXT,
+    descripcion_pedido TEXT,
+    ancho TEXT,
+    molde TEXT,
+    ancho_bies TEXT,
+    dobladillo TEXT,
+    observaciones TEXT,
+    imagen_diseno TEXT,
+    cantidad_total INTEGER DEFAULT 0,
+    estado_general TEXT DEFAULT 'activa',
+    paquete_id TEXT,
+    requerimientos JSONB DEFAULT '{}',
+
+    -- Tallas infantiles
+    talla_2t INTEGER DEFAULT 0,
+    talla_3t INTEGER DEFAULT 0,
+    talla_4t INTEGER DEFAULT 0,
+    talla_5t INTEGER DEFAULT 0,
+    talla_2 INTEGER DEFAULT 0,
+    talla_4 INTEGER DEFAULT 0,
+    talla_6 INTEGER DEFAULT 0,
+    talla_8 INTEGER DEFAULT 0,
+    talla_10 INTEGER DEFAULT 0,
+    talla_12 INTEGER DEFAULT 0,
+    talla_14 INTEGER DEFAULT 0,
+    talla_16 INTEGER DEFAULT 0,
+
+    -- Tallas adulto
+    talla_xs INTEGER DEFAULT 0,
+    talla_s INTEGER DEFAULT 0,
+    talla_m INTEGER DEFAULT 0,
+    talla_l INTEGER DEFAULT 0,
+    talla_xl INTEGER DEFAULT 0,
+    talla_2xl INTEGER DEFAULT 0,
+    talla_3xl INTEGER DEFAULT 0,
+    talla_4xl INTEGER DEFAULT 0,
+
+    -- Pantalón mujer
+    talla_pantalon_mujer_4 INTEGER DEFAULT 0,
+    talla_pantalon_mujer_6 INTEGER DEFAULT 0,
+    talla_pantalon_mujer_8 INTEGER DEFAULT 0,
+    talla_pantalon_mujer_10 INTEGER DEFAULT 0,
+    talla_pantalon_mujer_12 INTEGER DEFAULT 0,
+    talla_pantalon_mujer_14 INTEGER DEFAULT 0,
+    talla_pantalon_mujer_16 INTEGER DEFAULT 0,
+    talla_pantalon_mujer_18 INTEGER DEFAULT 0,
+    talla_pantalon_mujer_20 INTEGER DEFAULT 0,
+    talla_pantalon_mujer_22 INTEGER DEFAULT 0,
+
+    -- Pantalón hombre
+    talla_pantalon_hombre_26 INTEGER DEFAULT 0,
+    talla_pantalon_hombre_28 INTEGER DEFAULT 0,
+    talla_pantalon_hombre_30 INTEGER DEFAULT 0,
+    talla_pantalon_hombre_32 INTEGER DEFAULT 0,
+    talla_pantalon_hombre_34 INTEGER DEFAULT 0,
+    talla_pantalon_hombre_36 INTEGER DEFAULT 0,
+    talla_pantalon_hombre_38 INTEGER DEFAULT 0,
+    talla_pantalon_hombre_40 INTEGER DEFAULT 0,
+    talla_pantalon_hombre_42 INTEGER DEFAULT 0,
+    talla_pantalon_hombre_44 INTEGER DEFAULT 0,
+
+    -- Pantalonetas
+    talla_pantaloneta_s INTEGER DEFAULT 0,
+    talla_pantaloneta_m INTEGER DEFAULT 0,
+    talla_pantaloneta_l INTEGER DEFAULT 0,
+    talla_pantaloneta_xl INTEGER DEFAULT 0,
+
+    -- Pijamas
+    talla_pijama_s INTEGER DEFAULT 0,
+    talla_pijama_m INTEGER DEFAULT 0,
+    talla_pijama_l INTEGER DEFAULT 0,
+    talla_pijama_xl INTEGER DEFAULT 0,
+
+    -- Sudaderas
+    talla_sudadera_s INTEGER DEFAULT 0,
+    talla_sudadera_m INTEGER DEFAULT 0,
+    talla_sudadera_l INTEGER DEFAULT 0,
+    talla_sudadera_xl INTEGER DEFAULT 0,
+
+    -- Chaquetas
+    talla_chaqueta_s INTEGER DEFAULT 0,
+    talla_chaqueta_m INTEGER DEFAULT 0,
+    talla_chaqueta_l INTEGER DEFAULT 0,
+    talla_chaqueta_xl INTEGER DEFAULT 0,
+
+    -- Estados por área
+    estado_corte TEXT DEFAULT 'pendiente',
+    estado_confeccion TEXT DEFAULT 'pendiente',
+    estado_impresion TEXT DEFAULT 'pendiente',
+    estado_sublimacion TEXT DEFAULT 'pendiente',
+    estado_despacho TEXT DEFAULT 'pendiente',
+    estado_dtf TEXT DEFAULT 'pendiente',
+    estado_estampado TEXT DEFAULT 'pendiente',
+    estado_corte_laser TEXT DEFAULT 'pendiente',
+
+    -- Progreso por área
+    progreso_corte JSONB DEFAULT '{}',
+    progreso_confeccion JSONB DEFAULT '{}',
+    progreso_impresion JSONB DEFAULT '{}',
+    progreso_sublimacion JSONB DEFAULT '{}',
+    progreso_despacho JSONB DEFAULT '{}',
+    progreso_dtf JSONB DEFAULT '{}',
+    progreso_estampado JSONB DEFAULT '{}',
+    progreso_corte_laser JSONB DEFAULT '{}'
+);
+
+-- ==========================================
+-- TABLA: historial_ordenes
+-- ==========================================
+CREATE TABLE historial_ordenes (
+    id BIGSERIAL PRIMARY KEY,
+    numero_orden TEXT,
+    cliente TEXT,
+    tipo_prenda TEXT,
+    total_prendas INTEGER DEFAULT 0,
+    fecha_pedido DATE,
+    fecha_entrega DATE,
+    fecha_completado TIMESTAMPTZ DEFAULT NOW(),
+    datos_completos JSONB DEFAULT '{}'
+);
+
+-- ==========================================
+-- TABLA: usuarios
+-- ==========================================
+CREATE TABLE usuarios (
+    id BIGSERIAL PRIMARY KEY,
+    clave TEXT NOT NULL
+);
+
+-- Insertar la clave del jefe (cámbiala por la que quieras)
+INSERT INTO usuarios (clave) VALUES ('tu_clave_aqui');
+
+-- ==========================================
+-- POLÍTICAS RLS (Row Level Security)
+-- ==========================================
+ALTER TABLE ordenes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE historial_ordenes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE usuarios ENABLE ROW LEVEL SECURITY;
+
+-- Permitir todo a usuarios anónimos (la app no usa auth de Supabase)
+CREATE POLICY "acceso_publico_ordenes" ON ordenes FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "acceso_publico_historial" ON historial_ordenes FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "acceso_publico_usuarios" ON usuarios FOR SELECT USING (true);
+
+
+
+
+
+then i have to change the two first lines
