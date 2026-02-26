@@ -1,167 +1,221 @@
 -- ==========================================
--- TABLA: ordenes
+-- BASE DE DATOS - REG Marketing S.A.S
+-- Sistema de Gestión de Producción Textil
+-- Ejecutar en Supabase SQL Editor
 -- ==========================================
-CREATE TABLE ordenes (
-    id BIGSERIAL PRIMARY KEY,
-    numero_orden TEXT UNIQUE NOT NULL,
-    cliente TEXT,
-    fecha_pedido DATE,
-    fecha_entrega DATE,
-    fecha_creacion TIMESTAMPTZ DEFAULT NOW(),
-    fecha_completado TIMESTAMPTZ,
-    arte TEXT,
-    impresora TEXT,
-    tipo_prenda TEXT,
-    tipo_prenda_valor TEXT,
-    tela TEXT,
-    cuello TEXT,
-    color_cuello TEXT,
-    marquilla TEXT,
-    descripcion_pedido TEXT,
-    ancho TEXT,
-    molde TEXT,
-    ancho_bies TEXT,
-    dobladillo TEXT,
-    observaciones TEXT,
-    imagen_diseno TEXT,
-    cantidad_total INTEGER DEFAULT 0,
-    estado_general TEXT DEFAULT 'activa',
-    paquete_id TEXT,
-    requerimientos JSONB DEFAULT '{}',
 
-    -- Tallas infantiles
-    talla_2t INTEGER DEFAULT 0,
-    talla_3t INTEGER DEFAULT 0,
-    talla_4t INTEGER DEFAULT 0,
-    talla_5t INTEGER DEFAULT 0,
-    talla_2 INTEGER DEFAULT 0,
-    talla_4 INTEGER DEFAULT 0,
-    talla_6 INTEGER DEFAULT 0,
-    talla_8 INTEGER DEFAULT 0,
-    talla_10 INTEGER DEFAULT 0,
-    talla_12 INTEGER DEFAULT 0,
-    talla_14 INTEGER DEFAULT 0,
-    talla_16 INTEGER DEFAULT 0,
-
-    -- Tallas adulto
-    talla_xs INTEGER DEFAULT 0,
-    talla_s INTEGER DEFAULT 0,
-    talla_m INTEGER DEFAULT 0,
-    talla_l INTEGER DEFAULT 0,
-    talla_xl INTEGER DEFAULT 0,
-    talla_2xl INTEGER DEFAULT 0,
-    talla_3xl INTEGER DEFAULT 0,
-    talla_4xl INTEGER DEFAULT 0,
-
-    -- Pantalón mujer
-    talla_pantalon_mujer_4 INTEGER DEFAULT 0,
-    talla_pantalon_mujer_6 INTEGER DEFAULT 0,
-    talla_pantalon_mujer_8 INTEGER DEFAULT 0,
-    talla_pantalon_mujer_10 INTEGER DEFAULT 0,
-    talla_pantalon_mujer_12 INTEGER DEFAULT 0,
-    talla_pantalon_mujer_14 INTEGER DEFAULT 0,
-    talla_pantalon_mujer_16 INTEGER DEFAULT 0,
-    talla_pantalon_mujer_18 INTEGER DEFAULT 0,
-    talla_pantalon_mujer_20 INTEGER DEFAULT 0,
-    talla_pantalon_mujer_22 INTEGER DEFAULT 0,
-
-    -- Pantalón hombre
-    talla_pantalon_hombre_26 INTEGER DEFAULT 0,
-    talla_pantalon_hombre_28 INTEGER DEFAULT 0,
-    talla_pantalon_hombre_30 INTEGER DEFAULT 0,
-    talla_pantalon_hombre_32 INTEGER DEFAULT 0,
-    talla_pantalon_hombre_34 INTEGER DEFAULT 0,
-    talla_pantalon_hombre_36 INTEGER DEFAULT 0,
-    talla_pantalon_hombre_38 INTEGER DEFAULT 0,
-    talla_pantalon_hombre_40 INTEGER DEFAULT 0,
-    talla_pantalon_hombre_42 INTEGER DEFAULT 0,
-    talla_pantalon_hombre_44 INTEGER DEFAULT 0,
-
-    -- Pantalonetas
-    talla_pantaloneta_s INTEGER DEFAULT 0,
-    talla_pantaloneta_m INTEGER DEFAULT 0,
-    talla_pantaloneta_l INTEGER DEFAULT 0,
-    talla_pantaloneta_xl INTEGER DEFAULT 0,
-
-    -- Pijamas
-    talla_pijama_s INTEGER DEFAULT 0,
-    talla_pijama_m INTEGER DEFAULT 0,
-    talla_pijama_l INTEGER DEFAULT 0,
-    talla_pijama_xl INTEGER DEFAULT 0,
-
-    -- Sudaderas
-    talla_sudadera_s INTEGER DEFAULT 0,
-    talla_sudadera_m INTEGER DEFAULT 0,
-    talla_sudadera_l INTEGER DEFAULT 0,
-    talla_sudadera_xl INTEGER DEFAULT 0,
-
-    -- Chaquetas
-    talla_chaqueta_s INTEGER DEFAULT 0,
-    talla_chaqueta_m INTEGER DEFAULT 0,
-    talla_chaqueta_l INTEGER DEFAULT 0,
-    talla_chaqueta_xl INTEGER DEFAULT 0,
-
-    -- Estados por área
-    estado_corte TEXT DEFAULT 'pendiente',
-    estado_confeccion TEXT DEFAULT 'pendiente',
-    estado_impresion TEXT DEFAULT 'pendiente',
-    estado_sublimacion TEXT DEFAULT 'pendiente',
-    estado_despacho TEXT DEFAULT 'pendiente',
-    estado_dtf TEXT DEFAULT 'pendiente',
-    estado_estampado TEXT DEFAULT 'pendiente',
-    estado_corte_laser TEXT DEFAULT 'pendiente',
-
-    -- Progreso por área
-    progreso_corte JSONB DEFAULT '{}',
-    progreso_confeccion JSONB DEFAULT '{}',
-    progreso_impresion JSONB DEFAULT '{}',
-    progreso_sublimacion JSONB DEFAULT '{}',
-    progreso_despacho JSONB DEFAULT '{}',
-    progreso_dtf JSONB DEFAULT '{}',
-    progreso_estampado JSONB DEFAULT '{}',
-    progreso_corte_laser JSONB DEFAULT '{}'
-);
-
--- ==========================================
--- TABLA: historial_ordenes
--- ==========================================
-CREATE TABLE historial_ordenes (
-    id BIGSERIAL PRIMARY KEY,
-    numero_orden TEXT,
-    cliente TEXT,
-    tipo_prenda TEXT,
-    total_prendas INTEGER DEFAULT 0,
-    fecha_pedido DATE,
-    fecha_entrega DATE,
-    fecha_completado TIMESTAMPTZ DEFAULT NOW(),
-    datos_completos JSONB DEFAULT '{}'
-);
 
 -- ==========================================
 -- TABLA: usuarios
 -- ==========================================
-CREATE TABLE usuarios (
-    id BIGSERIAL PRIMARY KEY,
-    clave TEXT NOT NULL
+CREATE TABLE IF NOT EXISTS usuarios (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    clave text NOT NULL,
+    created_at timestamptz DEFAULT now()
 );
 
--- Insertar la clave del jefe (cámbiala por la que quieras)
-INSERT INTO usuarios (clave) VALUES ('tu_clave_aqui');
 
 -- ==========================================
--- POLÍTICAS RLS (Row Level Security)
+-- TABLA: ordenes
 -- ==========================================
-ALTER TABLE ordenes ENABLE ROW LEVEL SECURITY;
+CREATE TABLE IF NOT EXISTS ordenes (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    numero_orden text UNIQUE NOT NULL,
+    cliente text,
+    fecha_pedido date,
+    fecha_entrega date,
+    fecha_creacion timestamptz DEFAULT now(),
+    fecha_completado timestamptz,
+    arte text,
+    impresora text,
+    tipo_prenda text,
+    tipo_prenda_valor text,
+    tela text,
+    cuello text,
+    color_cuello text,
+    marquilla text,
+    descripcion_pedido text,
+    ancho text,
+    molde text,
+    ancho_bies text,
+    dobladillo text,
+    observaciones text,
+    estado_general text DEFAULT 'activa',
+
+    -- Imagen principal del diseño (base64)
+    imagen_diseno text,
+
+    -- Logos del diseño (base64)
+    imagen_manga_derecha text,
+    imagen_manga_izquierda text,
+    imagen_frente text,
+    imagen_espalda text,
+    imagenes_adicionales jsonb DEFAULT '[]'::jsonb,
+
+    -- Cantidad total (para accesorios sin tallas)
+    cantidad_total integer DEFAULT 0,
+
+    -- Requerimientos de áreas
+    requerimientos jsonb DEFAULT '{}'::jsonb,
+
+    -- Tallas Infantil
+    talla_2t integer DEFAULT 0,
+    talla_3t integer DEFAULT 0,
+    talla_4t integer DEFAULT 0,
+    talla_5t integer DEFAULT 0,
+    talla_2  integer DEFAULT 0,
+    talla_4  integer DEFAULT 0,
+    talla_6  integer DEFAULT 0,
+    talla_8  integer DEFAULT 0,
+    talla_10 integer DEFAULT 0,
+    talla_12 integer DEFAULT 0,
+    talla_14 integer DEFAULT 0,
+    talla_16 integer DEFAULT 0,
+
+    -- Tallas Adulto
+    talla_xs  integer DEFAULT 0,
+    talla_s   integer DEFAULT 0,
+    talla_m   integer DEFAULT 0,
+    talla_l   integer DEFAULT 0,
+    talla_xl  integer DEFAULT 0,
+    talla_2xl integer DEFAULT 0,
+    talla_3xl integer DEFAULT 0,
+    talla_4xl integer DEFAULT 0,
+
+    -- Tallas Pantalón Mujer
+    talla_pantalon_mujer_4  integer DEFAULT 0,
+    talla_pantalon_mujer_6  integer DEFAULT 0,
+    talla_pantalon_mujer_8  integer DEFAULT 0,
+    talla_pantalon_mujer_10 integer DEFAULT 0,
+    talla_pantalon_mujer_12 integer DEFAULT 0,
+    talla_pantalon_mujer_14 integer DEFAULT 0,
+    talla_pantalon_mujer_16 integer DEFAULT 0,
+    talla_pantalon_mujer_18 integer DEFAULT 0,
+    talla_pantalon_mujer_20 integer DEFAULT 0,
+    talla_pantalon_mujer_22 integer DEFAULT 0,
+
+    -- Tallas Pantalón Hombre
+    talla_pantalon_hombre_26 integer DEFAULT 0,
+    talla_pantalon_hombre_28 integer DEFAULT 0,
+    talla_pantalon_hombre_30 integer DEFAULT 0,
+    talla_pantalon_hombre_32 integer DEFAULT 0,
+    talla_pantalon_hombre_34 integer DEFAULT 0,
+    talla_pantalon_hombre_36 integer DEFAULT 0,
+    talla_pantalon_hombre_38 integer DEFAULT 0,
+    talla_pantalon_hombre_40 integer DEFAULT 0,
+    talla_pantalon_hombre_42 integer DEFAULT 0,
+    talla_pantalon_hombre_44 integer DEFAULT 0,
+
+    -- Tallas Pantalonetas
+    talla_pantaloneta_s  integer DEFAULT 0,
+    talla_pantaloneta_m  integer DEFAULT 0,
+    talla_pantaloneta_l  integer DEFAULT 0,
+    talla_pantaloneta_xl integer DEFAULT 0,
+
+    -- Tallas Pijamas
+    talla_pijama_s  integer DEFAULT 0,
+    talla_pijama_m  integer DEFAULT 0,
+    talla_pijama_l  integer DEFAULT 0,
+    talla_pijama_xl integer DEFAULT 0,
+
+    -- Tallas Sudaderas / Joggers
+    talla_sudadera_s  integer DEFAULT 0,
+    talla_sudadera_m  integer DEFAULT 0,
+    talla_sudadera_l  integer DEFAULT 0,
+    talla_sudadera_xl integer DEFAULT 0,
+
+    -- Tallas Chaquetas
+    talla_chaqueta_s  integer DEFAULT 0,
+    talla_chaqueta_m  integer DEFAULT 0,
+    talla_chaqueta_l  integer DEFAULT 0,
+    talla_chaqueta_xl integer DEFAULT 0,
+
+    -- Estados por área
+    estado_corte       text DEFAULT 'pendiente',
+    estado_confeccion  text DEFAULT 'pendiente',
+    estado_impresion   text DEFAULT 'pendiente',
+    estado_sublimacion text DEFAULT 'pendiente',
+    estado_despacho    text DEFAULT 'pendiente',
+    estado_dtf         text DEFAULT 'pendiente',
+    estado_estampado   text DEFAULT 'pendiente',
+    estado_corte_laser text DEFAULT 'pendiente',
+
+    -- Progreso por área (jsonb con cantidades por talla)
+    progreso_corte       jsonb DEFAULT '{}'::jsonb,
+    progreso_confeccion  jsonb DEFAULT '{}'::jsonb,
+    progreso_impresion   jsonb DEFAULT '{}'::jsonb,
+    progreso_sublimacion jsonb DEFAULT '{}'::jsonb,
+    progreso_despacho    jsonb DEFAULT '{}'::jsonb,
+    progreso_dtf         jsonb DEFAULT '{}'::jsonb,
+    progreso_estampado   jsonb DEFAULT '{}'::jsonb,
+    progreso_corte_laser jsonb DEFAULT '{}'::jsonb,
+
+    -- Paquete
+    paquete_id text
+);
+
+
+-- ==========================================
+-- TABLA: historial_ordenes
+-- ==========================================
+CREATE TABLE IF NOT EXISTS historial_ordenes (
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    numero_orden text,
+    cliente text,
+    tipo_prenda text,
+    total_prendas integer DEFAULT 0,
+    fecha_pedido date,
+    fecha_entrega date,
+    fecha_completado timestamptz DEFAULT now(),
+    datos_completos jsonb
+);
+
+
+-- ==========================================
+-- ÍNDICES para mejorar rendimiento
+-- ==========================================
+CREATE INDEX IF NOT EXISTS idx_ordenes_numero ON ordenes(numero_orden);
+CREATE INDEX IF NOT EXISTS idx_ordenes_estado_general ON ordenes(estado_general);
+CREATE INDEX IF NOT EXISTS idx_ordenes_paquete ON ordenes(paquete_id);
+CREATE INDEX IF NOT EXISTS idx_historial_numero ON historial_ordenes(numero_orden);
+CREATE INDEX IF NOT EXISTS idx_historial_fecha ON historial_ordenes(fecha_completado);
+
+
+-- ==========================================
+-- RLS (Row Level Security) - Acceso público
+-- para que el sistema funcione con anon key
+-- ==========================================
+ALTER TABLE ordenes           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE historial_ordenes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE usuarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE usuarios          ENABLE ROW LEVEL SECURITY;
 
--- Permitir todo a usuarios anónimos (la app no usa auth de Supabase)
-CREATE POLICY "acceso_publico_ordenes" ON ordenes FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "acceso_publico_historial" ON historial_ordenes FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "acceso_publico_usuarios" ON usuarios FOR SELECT USING (true);
+-- Políticas permisivas para anon (el sistema usa anon key)
+CREATE POLICY "Acceso publico ordenes"
+    ON ordenes FOR ALL
+    TO anon
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Acceso publico historial"
+    ON historial_ordenes FOR ALL
+    TO anon
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Acceso publico usuarios"
+    ON usuarios FOR ALL
+    TO anon
+    USING (true)
+    WITH CHECK (true);
 
 
+-- ==========================================
+-- INSERTAR CONTRASEÑA DE ADMINISTRADOR
+-- Cambiar '1234' por la contraseña que quieras
+-- ==========================================
+INSERT INTO usuarios (clave) VALUES ('1234');
 
 
-
-then i have to change the two first lines
+-- ==========================================
+-- FIN DEL SCRIPT
+-- ==========================================
