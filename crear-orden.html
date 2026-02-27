@@ -1269,8 +1269,13 @@
                 
                 document.getElementById('btnCerrarError').onclick = () => {
                     modal.remove();
-                    document.getElementById('numeroOrden').focus();
-                    document.getElementById('numeroOrden').select();
+                    const campoNumero = document.getElementById('numeroOrden');
+                    campoNumero.readOnly = false;
+                    campoNumero.style.background = '#FFF8E1';
+                    campoNumero.style.borderColor = '#F57C00';
+                    campoNumero.style.color = '#E65100';
+                    campoNumero.focus();
+                    campoNumero.select();
                 };
                 
                 modal.onclick = (e) => {
