@@ -645,6 +645,46 @@ async function verificarLogin(clave) {
         .single();
     return !error && data;
 }
+
+// ==========================================
+// SUPABASE STORAGE - IMÁGENES
+// ==========================================
+
+async function subirImagen(archivo, carpeta) {
+    try {
+        const extension = archivo.name.split('.').pop() || 'jpg';
+        const nombreArchivo = `${carpeta}/${Date.now()}_${Math.random().toString(36).substring(2)}.${extension}`;
+        
+        const { data, error } = await supabaseClient.storage
+            .from('imagenes-ordenes')
+            .upload(nombreArchivo, archivo, {
+                cacheControl: '3600',
+                upsert: false
+            });
+        
+        if (error) throw error;
+        
+        const { data: urlData } = supabaseClient.storage
+            .from('imagenes-ordenes')
+            .getPublicUrl(nombreArchivo);
+        
+        return { success: true, url: urlData.publicUrl };
+    } catch (error) {
+        console.error('❌ Error al subir imagen:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+async function eliminarImagen(url) {
+    try {
+        if (!url || !url.includes('imagenes-ordenes')) return;
+        const path = url.split('/imagenes-ordenes/')[1];
+        if (!path) return;
+        await supabaseClient.storage.from('imagenes-ordenes').remove([path]);
+    } catch (error) {
+        console.error('Error al eliminar imagen:', error);
+    }
+}
 // Para usar en otros archivos:
 window.DB = {
     // Órdenes
@@ -665,7 +705,9 @@ window.DB = {
     verificarConexion,
     guardarRespaldoLocal,
     obtenerSiguienteNumeroOrden,
-    verificarLogin
+    verificarLogin,
+    subirImagen,
+    eliminarImagen
 
 };
 

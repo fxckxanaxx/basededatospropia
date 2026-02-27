@@ -420,6 +420,12 @@
 
     <script>
 
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) {
+                window.location.reload();
+            }
+        });
+
         if (sessionStorage.getItem('jefeAutenticado') !== 'true') {
             window.location.href = 'index.html';
         }
@@ -1816,7 +1822,8 @@
 
         document.body.appendChild(overlay);
 
-        const today = new Date().toISOString().split('T')[0];
+        const hoy = new Date();
+        const today = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
         document.getElementById('pkgFechaPedido').value = today;
 
         agregarFilaPrenda();
@@ -2206,16 +2213,40 @@
         const fileInput = document.getElementById(`file-${idFila}`);
 
         uploadDiv.onclick = () => fileInput.click();
-        fileInput.addEventListener('change', function() {
+        fileInput.addEventListener('change', async function() {
             const file = this.files[0];
             if (!file) return;
+
+            uploadDiv.innerHTML = `<i class="fas fa-spinner fa-spin" style="font-size:1.4rem;color:#90CAF9;"></i>`;
+
             const reader = new FileReader();
             reader.onload = e => {
-                fila._imagenBase64 = e.target.result;
-                uploadDiv.innerHTML = `<img src="${e.target.result}"
-                    style="width:68px;height:68px;object-fit:cover;border-radius:8px;">`;
-                uploadDiv.style.border = '2px solid #2E7D32';
-                uploadDiv.style.padding = '0';
+                const img = new Image();
+                img.onload = async function() {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    const max = 400;
+                    if (w > max || h > max) {
+                        if (w > h) { h = Math.round(h * max / w); w = max; }
+                        else { w = Math.round(w * max / h); h = max; }
+                    }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+                    canvas.toBlob(async function(blob) {
+                        const archivoComprimido = new File([blob], file.name, { type: 'image/jpeg' });
+                        const resultado = await window.DB.subirImagen(archivoComprimido, 'paquetes');
+
+                        const urlFinal = resultado.success ? resultado.url : canvas.toDataURL('image/jpeg', 0.35);
+                        fila._imagenBase64 = urlFinal;
+
+                        uploadDiv.innerHTML = `<img src="${urlFinal}"
+                            style="width:68px;height:68px;object-fit:cover;border-radius:8px;">`;
+                        uploadDiv.style.border = '2px solid #2E7D32';
+                        uploadDiv.style.padding = '0';
+                    }, 'image/jpeg', 0.35);
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         });
