@@ -1284,6 +1284,22 @@
         
         try {
             // Eliminar de Supabase
+            // Eliminar imágenes del Storage
+            const ordenAEliminar = ordenes.find(o => o.numeroOrden === numeroOrden);
+            if (ordenAEliminar) {
+                const imagenesAEliminar = [
+                    ordenAEliminar.imagenDiseno,
+                    ordenAEliminar.imagenMangaDerecha,
+                    ordenAEliminar.imagenMangaIzquierda,
+                    ordenAEliminar.imagenFrente,
+                    ordenAEliminar.imagenEspalda,
+                    ...(ordenAEliminar.imagenesAdicionales || [])
+                ].filter(url => url && url.includes('supabase'));
+                
+                for (const url of imagenesAEliminar) {
+                    await window.DB.eliminarImagen(url);
+                }
+            }
             const resultado = await window.DB.eliminarOrden(numeroOrden);
             
             if (resultado.success) {
