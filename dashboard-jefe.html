@@ -430,6 +430,14 @@
             window.location.href = 'index.html';
         }
         async function cargarOrdenes() {
+            // Guardar paquetes abiertos
+            const paquetesAbiertos = new Set();
+            document.querySelectorAll('[id^="contenido-"]').forEach(el => {
+                if (el.style.maxHeight && el.style.maxHeight !== '0px') {
+                    paquetesAbiertos.add(el.id.replace('contenido-', ''));
+                }
+            });
+            
             let ordenes = await window.DB.obtenerOrdenes();
             if (!ordenes || ordenes.length === 0) {
                 ordenes = JSON.parse(localStorage.getItem('ordenes') || '[]');
@@ -555,7 +563,20 @@
             html += sinPaquete.map(orden => renderOrdenCard(orden)).join('');
 
             listaOrdenes.innerHTML = html;
-        }
+
+            // Restaurar paquetes que estaban abiertos
+            paquetesAbiertos.forEach(pkgUid => {
+                const contenido = document.getElementById(`contenido-${pkgUid}`);
+                const chevron = document.getElementById(`chevron-${pkgUid}`);
+                const header = contenido?.previousElementSibling;
+                if (contenido) {
+                    contenido.style.transition = 'none';
+                    contenido.style.maxHeight = 'none';
+                    if (chevron) chevron.style.transform = 'rotate(180deg)';
+                    if (header) header.classList.add('abierto');
+                }
+            });
+                    }
 
         function renderOrdenCard(orden) {
             const totalPrendas = orden.cantidadTotal || Object.values(orden.tallas || {}).reduce((sum, val) => sum + val, 0);
