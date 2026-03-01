@@ -957,6 +957,22 @@
                 );
                 if (!confirmar) return;
                 try {
+                    // Eliminar imágenes del Storage antes de limpiar
+                    const historialActual = JSON.parse(localStorage.getItem('historialOrdenes') || '[]');
+                    for (const orden of historialActual) {
+                        const imagenes = [
+                            orden.imagenDiseno,
+                            orden.imagenMangaDerecha,
+                            orden.imagenMangaIzquierda,
+                            orden.imagenFrente,
+                            orden.imagenEspalda,
+                            ...(orden.imagenesAdicionales || [])
+                        ].filter(url => url && url.includes('supabase'));
+                        for (const url of imagenes) {
+                            await window.DB.eliminarImagen(url);
+                        }
+                    }
+
                     await window.DB.limpiarHistorial();
                     localStorage.removeItem('historialOrdenes');
                     overlay.remove();
