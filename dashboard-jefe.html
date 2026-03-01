@@ -805,19 +805,23 @@
         }
         
         async function verHistorial() {
-            let historial = JSON.parse(localStorage.getItem('historialOrdenes') || '[]');
-
-            // Abrir modal inmediatamente con localStorage
-            // Supabase sincroniza en segundo plano
-            window.DB.obtenerHistorial().then(data => {
+            // Siempre cargar desde Supabase al abrir
+            let historial = [];
+            try {
+                const data = await window.DB.obtenerHistorial();
                 if (data && data.length > 0) {
-                    const nuevo = data.map(item => ({
+                    historial = data.map(item => ({
                         ...item.datos_completos,
                         fechaCompletado: item.fecha_completado
                     }));
-                    localStorage.setItem('historialOrdenes', JSON.stringify(nuevo));
+                    localStorage.setItem('historialOrdenes', JSON.stringify(historial));
+                } else {
+                    localStorage.removeItem('historialOrdenes');
                 }
-            }).catch(() => {});
+            } catch(e) {
+                // Si falla Supabase, usar localStorage como respaldo
+                historial = JSON.parse(localStorage.getItem('historialOrdenes') || '[]');
+            }
 
             const overlay = document.createElement('div');
             overlay.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;
